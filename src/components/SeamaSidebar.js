@@ -68,7 +68,13 @@ class SeamaSidebar extends Component {
       //   name: 'Kiosks',
       //   icon: 'glyphicon-home',
       //   isAdminFeature: true
-      // }
+      // },
+      {
+        path: '/settings',
+        name: 'Settings',
+        icon: 'glyphicon-cog',
+        isAdminFeature: true
+      }
     ];
 
     return (

@@ -8,6 +8,7 @@ import SemaSales from "./reports/SemaSales";
 import SemaVolume from "./reports/SemaVolume";
 import SemaDemographics from "./reports/SemaDemographics";
 import DataExport from "./DataExport";
+import Settings from "./Settings";
 import { PrivateRoute, SemaNotFound } from '.';
 
 const Routes = props => (
@@ -22,6 +23,7 @@ const Routes = props => (
     <PrivateRoute allowed={['admin']} exact path="/products/create" component={ProductDetails} />
     <PrivateRoute allowed={['admin']} path="/products/:id" component={ProductDetails} />
     <PrivateRoute allowed={['admin']} exact path="/data-export" component={DataExport} />
+    <PrivateRoute allowed={['admin']} exact path="/settings" component={Settings} />
 
     <PrivateRoute component={SemaNotFound} />
   </Switch>
