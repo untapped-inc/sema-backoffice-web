@@ -62,6 +62,9 @@ const ProductForm = ({ handleSubmit, ...props }) => {
                           .list()
                           .filter(unit => unit.system === preferredUnitSystem.value)
                           .filter(unit => supportedMeasures.includes(unit.measure))
+                          .sort((a, b) => {
+                            return a.singular < b.singular ? -1 : 1;
+                          })
                           .map(unit => ({ label: unit.singular.toLowerCase(), value: unit.singular.toLowerCase() }));
 
   return (
