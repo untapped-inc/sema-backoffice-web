@@ -19,6 +19,7 @@ import volume from './VolumeReducer';
 import sales from './SalesReducer';
 import customer from './CustomerReducer';
 import dateFilter from './DateFilterReducer';
+import settingsReducer from './SettingsReducer';
 
 const rootPersistConfig = {
   key: 'root',
@@ -51,7 +52,8 @@ const rootReducer = combineReducers({
 	sales,
   waterOperations,
   salesChannels: salesChannelReducer,
-  dateFilter
+  dateFilter,
+  settings: settingsReducer
 });
 
 export default persistReducer(rootPersistConfig, rootReducer);
