@@ -13,6 +13,7 @@ import {
   createProduct,
   updateProduct
 } from '../actions/ProductActions';
+import * as SettingsActions from '../actions/SettingsActions';
 import { createLoadingSelector } from '../reducers/selectors';
 
 const propTypes = {
@@ -23,9 +24,11 @@ const defaultProps = {
 };
 
 class ProductDetails extends Component {
-  componentWillMount() {
+  componentDidMount() {
     const { id } = this.props.match.params;
     if (id && id !== 'new') this.props.getProduct(id);
+
+    this.props.settingsActions.fetchSettings();
   }
 
   render() {
@@ -41,13 +44,15 @@ class ProductDetails extends Component {
         {!loading && (
           <div>
             <PageHeader>{name || 'Create Product'}</PageHeader>
-            <ProductForm
+            {this.props.settings && (<ProductForm
+              settings={this.props.settings}
               onSubmit={values =>
                 isEmpty(selectedProduct)
                   ? this.props.createProduct(values)
                   : this.props.updateProduct(values)
               }
             />
+            )}
           </div>
         )}
       </div>
@@ -62,14 +67,16 @@ const loadingSelector = createLoadingSelector(['GET_PRODUCT']);
 
 const mapStateToProps = state => ({
   selectedProduct: state.selectedProduct,
-  loading: loadingSelector(state)
+  loading: loadingSelector(state),
+  settings: state.settings
 });
 
 const mapDispatchToProps = dispatch => ({
   getProduct: bindActionCreators(getProduct, dispatch),
   resetProduct: dispatch(resetProduct()),
   createProduct: bindActionCreators(createProduct, dispatch),
-  updateProduct: bindActionCreators(updateProduct, dispatch)
+  updateProduct: bindActionCreators(updateProduct, dispatch),
+  settingsActions: bindActionCreators(SettingsActions, dispatch)
 });
 
 export default connect(
