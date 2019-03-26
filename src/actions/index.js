@@ -7,3 +7,4 @@ export * from './CustomerActions';
 export * from './KioskActions';
 export * from './VolumeActions';
 export * from './DateFilterActions';
+export * from './SettingsActions';
