@@ -30,7 +30,7 @@ class Settings extends Component {
 
 				<hr />
 
-				{this.props.settings.generalSettings &&
+				{this.props.settings &&
 					<Formik
 						initialValues={this._getInitialValues()}
 						onSubmit={(values, { setSubmitting }) => {
@@ -54,7 +54,7 @@ class Settings extends Component {
 							values
 						}) => (
 								<Form>
-									{this.props.settings.generalSettings.map(settings => {
+									{this.props.settings.map(settings => {
 
 										let inputModifier;
 
@@ -96,7 +96,7 @@ class Settings extends Component {
 	}
 
 	_getInitialValues() {
-		return this.props.settings.generalSettings.reduce((final, item) => {
+		return this.props.settings.reduce((final, item) => {
 			final[`${item.name}`] = item.value;
 			return final;
 		}, {});
