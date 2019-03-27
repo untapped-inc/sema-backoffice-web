@@ -16,7 +16,7 @@ function initializeVolume() {
 			volumeByChannelAndIncome:[],
 			volumeByChannelAndType:[],
 			volumeByChannelAndPaymentType:[],
-			volumeWaterMeasureUnits: 'liter'
+			volumeWaterMeasureUnits: 'N/A'
 		}
 	}
 }
