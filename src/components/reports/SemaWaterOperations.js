@@ -11,20 +11,31 @@ import SemaDatabaseError from "../SeamaDatabaseError";
 import { connect } from "react-redux";
 import { bindActionCreators } from "redux";
 import {
-waterOperationsActions,
-healthCheckActions
+	waterOperationsActions,
+	healthCheckActions
 } from '../../actions';
+import * as settingsActions from '../../actions/SettingsActions';
 import { withRouter } from 'react-router'
 import SemaSummaryPanel2 from "./WaterOperations/SemaSummaryPanel2";
 import LoadProgress from "../LoadProgress";
+import { getSettingsItem } from '../../utils/functions';
+import convert from 'convert-units';
 
 class SemaWaterOperations extends Component {
 
 	constructor(props) {
 		super(props);
 
-		this.endDate = new Date(Date.now());
-		this.startDate = new Date( this.endDate.getFullYear(), 0, 1 );
+		this.defaultUnitSystem = getSettingsItem(this.props.settings || [], 'default_unit_system').value || '';
+
+		this.literUnit = convert().describe('l');
+		this.gallonUnit = convert().describe('gal');
+
+		this.state = {
+			waterUnit: this.defaultUnitSystem === 'imperial' ? this.gallonUnit : this.literUnit
+		};
+
+		this._getUnitMeasure = this._getUnitMeasure.bind(this);
 	}
 
 	render() {
@@ -41,17 +52,26 @@ class SemaWaterOperations extends Component {
 
 	}
 
+	componentDidMount() {
+		this.props.settingsActions.fetchSettings();
+	}
+
+	_getUnitMeasure(value) {
+		if (value === 1) return this.state.waterUnit.singular.toLowerCase();
+		return this.state.waterUnit.plural.toLowerCase();
+	}
+
 	showWaterOperations() {
 		return (
 			<React.Fragment>
 				<div className="WaterSummaryProgress">
-					<LoadProgress/>
+					<LoadProgress />
 				</div>
-				<div className="WaterOperationsContainer" style={this.getHeight()}>
+				{this.props.settings && <div className="WaterOperationsContainer" style={this.getHeight()}>
 					<div className="WaterSummaryContainer">
 						<div className="WaterProduction">
 							<div className="WaterSummaryItem">
-								<SemaSummaryPanel1 title="Total Production" units={this.props.water.waterOperationsInfo.waterMeasureUnits}
+								<SemaSummaryPanel1 title="Total Production" units={this._getUnitMeasure(this.props.water.waterOperationsInfo.totalProduction)}
 									value={this.props.water.waterOperationsInfo.totalProduction}
 									valueColor=""
 									date={this.props.water.waterOperationsInfo.endDate} />
@@ -59,7 +79,7 @@ class SemaWaterOperations extends Component {
 						</div>
 						<div className="WaterWastage">
 							<div className="WaterSummaryItem">
-								<SemaSummaryPanel1 title="Total Wastage" units={this.props.water.waterOperationsInfo.waterMeasureUnits}
+								<SemaSummaryPanel1 title="Total Wastage" units={this._getUnitMeasure(this.calculateWastage())}
 									value={this.calculateWastage()}
 									valueColor="red"
 									date={this.props.water.waterOperationsInfo.endDate} />
@@ -92,6 +112,7 @@ class SemaWaterOperations extends Component {
 						</div>
 					</div>
 				</div>
+				}
 			</React.Fragment>
 		);
 	}
@@ -117,14 +138,16 @@ function mapStateToProps(state) {
 	return {
 		water: state.waterOperations,
 		healthCheck: state.healthCheck,
-		kiosk: state.kiosk
+		kiosk: state.kiosk,
+		settings: state.settings
 	};
 }
 
 function mapDispatchToProps(dispatch) {
 	return {
 		waterOperationsActions: bindActionCreators(waterOperationsActions, dispatch),
-		healthCheckActions: bindActionCreators(healthCheckActions, dispatch)
+		healthCheckActions: bindActionCreators(healthCheckActions, dispatch),
+		settingsActions: bindActionCreators(settingsActions, dispatch)
 	};
 }
 
