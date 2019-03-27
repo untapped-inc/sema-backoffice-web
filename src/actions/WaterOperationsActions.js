@@ -15,8 +15,8 @@ function initializeWaterOperations() {
 		waterOperationsInfo :{
 			beginDate:null,
 			endDate:null,
-			waterMeasureUnits: 'liter',
-			waterFlowrateUnits: 'lpm',
+			waterMeasureUnits: 'N/A',
+			waterFlowrateUnits: 'N/A',
 			waterPressureUnits: 'PSI',
 			totalProduction: null,
 			fillStation: null,
