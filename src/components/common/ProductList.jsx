@@ -34,8 +34,8 @@ class ProductList extends React.Component {
     return (
       <div className="product">
         <Thumbnail
-          src={`data:image/png;base64,${image}`}
-          imageSrc={`data:image/png;base64,${image}`}
+          src={image.startsWith('data:image') ? image : `data:image/jpeg;base64,${image}`}
+          imageSrc={image.startsWith('data:image') ? image : `data:image/jpeg;base64,${image}`}
           captionText={productName}
         />
         {/* <Image
