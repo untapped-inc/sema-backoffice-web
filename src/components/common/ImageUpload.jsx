@@ -1,5 +1,6 @@
 import React from 'react';
 import Dropzone from 'react-dropzone';
+import { isString } from 'util';
 
 const thumbsContainer = {
   display: 'flex',
@@ -48,7 +49,7 @@ class ImageUpload extends React.Component {
 
   updateFormValue(event) {
     const imageString = event.target.result;
-    const encodedImage = imageString.replace(/^data:image\/[a-z]+;base64,/, '');
+    const encodedImage = imageString;
     this.props.input.onChange(encodedImage);
   }
 
@@ -83,7 +84,7 @@ class ImageUpload extends React.Component {
             {(files[0] || value) && (
               <img
                 src={
-                  files[0] ? files[0].preview : `data:image/png;base64,${value}`
+                  files[0] ? files[0].preview : isString(value) && value.startsWith('data:image') ? value : `data:image/jpeg;base64,${value}`
                 }
                 style={img}
                 alt="product"
