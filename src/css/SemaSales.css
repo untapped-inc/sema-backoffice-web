@@ -122,3 +122,14 @@
     border-style: solid;
     border-width: medium;
 }
+.SalesTableContainer {
+	grid-column: 1 / span 2;
+	background:white;
+	border-color: rgb(101, 139, 194);
+    border-style: solid;
+    border-width: medium;
+}
+
+.rt-table {
+	overflow: scroll !important;
+}

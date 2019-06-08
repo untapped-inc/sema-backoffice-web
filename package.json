@@ -28,7 +28,7 @@
     "react-router-dom": "^4.2.2",
     "react-scripts": "1.1.1",
     "react-spinners": "^0.2.6",
-    "react-table": "^6.8.6",
+    "react-table": "^6.10.0",
     "react-toasts": "2.0.14",
     "redux": "^4.0.0",
     "redux-actions": "^2.6.3",
@@ -45,7 +45,7 @@
     "postinstall": "./update_theme.sh",
     "lint": "eslint ./src/**/*.js ./src/**/*.jsx"
   },
-  "proxy": "http://localhost:3001",
+  "proxy": "http://dev.semawater.org",
   "devDependencies": {
     "eslint": "4.19.1",
     "eslint-config-airbnb": "^17.1.0",

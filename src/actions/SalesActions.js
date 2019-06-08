@@ -24,7 +24,8 @@ function initializeSales() {
 			currencyUnits:'USD',
 			customerSales:[],
 			salesByChannel: {beginDate: null, endDate: null, datasets: []},
-			salesByChannelHistory: {beginDate: null, endDate: null, datasets: []}
+			salesByChannelHistory: {beginDate: null, endDate: null, datasets: []},
+			receipts:[]
 		}
 	}
 }
@@ -49,10 +50,10 @@ const fetchSalesData = ( params) => {
 
 			let units = await fetchMeasureUnits();
 			salesInfo.currencyUnits = units.currencyUnits;
-			window.dispatchEvent(new CustomEvent("progressEvent", {detail: {progressPct:50}} ));
+			window.dispatchEvent(new CustomEvent("progressEvent", {detail: {progressPct:40}} ));
 
 			salesInfo.salesByChannel = await fetchSalesByChannel(params);
-			window.dispatchEvent(new CustomEvent("progressEvent", {detail: {progressPct:75}} ));
+			window.dispatchEvent(new CustomEvent("progressEvent", {detail: {progressPct:60}} ));
 
 			// Decimate the results by 'month' for periods a year or longer
 			let groupBy = null;
@@ -62,6 +63,17 @@ const fetchSalesData = ( params) => {
 			}
 
 			salesInfo.salesByChannelHistory = await fetchSalesByChannelHistory(params, groupBy);
+			window.dispatchEvent(new CustomEvent("progressEvent", {detail: {progressPct:80}} ));
+
+			salesInfo.receipts = await fetchAllReceipts(params);
+			window.dispatchEvent(new CustomEvent("progressEvent", {detail: {progressPct:90}} ));
+
+			const allCustomers = await fetchAllCustomers(params);
+			const customersHash = {};
+			allCustomers.forEach(customer => {
+				customersHash[customer.id] = customer;
+			});
+			salesInfo.customersHash = customersHash;
 			window.dispatchEvent(new CustomEvent("progressEvent", {detail: {progressPct:100}} ));
 
 			resolve(salesInfo);
@@ -172,6 +184,48 @@ function fetchMeasureUnits(){
 			});
 	});
 
+}
+
+function fetchAllReceipts(params) {
+	return new Promise((resolve, reject ) => {
+		let url = '/sema/dataset/sales?siteId=' + params.kioskID;
+		if( params.hasOwnProperty("startDate") ){
+			url = url + "&beginDate=" + utilService.formatDateForUrl(params.startDate);
+		}
+		if( params.hasOwnProperty("endDate") ){
+			url = url + "&endDate=" + utilService.formatDateForUrl(params.endDate);
+		}
+		axiosService
+			.get(url)
+			.then(response => {
+				if(response.status === 200){
+					resolve(response.data)
+				}else{
+					reject({})
+				}
+			})
+			.catch(function(error){
+				reject( error)
+			});
+	});
+}
+
+function fetchAllCustomers(params) {
+	return new Promise((resolve, reject ) => {
+		let url = '/sema/dataset/customers?siteId=' + params.kioskID;
+		axiosService
+			.get(url)
+			.then(response => {
+				if(response.status === 200){
+					resolve(response.data)
+				}else{
+					reject({})
+				}
+			})
+			.catch(function(error){
+				reject( error)
+			});
+	});
 }
 
 function forceUpdate() {

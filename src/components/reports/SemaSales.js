@@ -16,6 +16,9 @@ import SalesByChannelChart from "./Sales/SalesByChannelChart";
 import SalesByChannelTimeChart from "./Sales/SalesByChannelTimeChart";
 import LoadProgress from "../LoadProgress";
 import { utilService } from '../../services';
+import ReactTable from "react-table";
+import "react-table/react-table.css";
+import moment from 'moment';
 
 let dateFormat = require('dateformat');
 
@@ -87,8 +90,95 @@ class SemaSales extends Component {
 								<SalesByChannelChart chartData={this.props.sales}/>
 							</div>
 						</div>
+						<div className="SalesTableContainer">
+							<ReactTable
+								data={this.props.sales.salesInfo.receipts}
+								columns={[{
+									Header: 'ID',
+									accessor: 'id',
+									width: 100
+								}, {
+									Header: 'Created Date',
+									id: 'createdDate',
+									accessor: d => {
+										return moment(d.created_at)
+											.local()
+											.format("YYYY-MM-DD hh:mm:ss a")
+									},
+									width: 100
+								}, {
+									Header: 'Updated Date',
+									id: 'updatedDate',
+									accessor: d => {
+										return moment(d.updated_at)
+											.local()
+											.format("YYYY-MM-DD hh:mm:ss a")
+									},
+									width: 100
+								}, {
+									Header: 'Customer Name',
+									id: 'customerName',
+									accessor: c => {
+										if (!this.props.sales.salesInfo.customersHash)
+											return '';
+										const customer = this.props.sales.salesInfo.customersHash[c.customer_account_id];
+										return customer ? customer.name : '';
+									},
+									width: 150
+								}, {
+									Header: 'Product SKU',
+									accessor: 'product_id',
+									style: { textAlign: "right" }
+								}, {
+									Header: 'Quantity',
+									accessor: 'quantity',
+									style: { textAlign: "right" }
+								}, {
+									Header: 'Amount Cash',
+									accessor: 'amount_cash',
+									style: { textAlign: "right" }
+								}, {
+									Header: 'Amount Mobile',
+									accessor: 'amount_mobile',
+									style: { textAlign: "right" }
+								}, {
+									Header: 'Amount Card',
+									accessor: 'amount_card',
+									style: { textAlign: "right" }
+								}, {
+									Header: 'Amount Loan',
+									accessor: 'amount_loan',
+									style: { textAlign: "right" }
+								}, {
+									Header: 'Payment Type',
+									accessor: 'payment_type'
+								}, {
+									Header: 'Unit Price',
+									accessor: 'unit_price',
+									style: { textAlign: "right" }
+								}, {
+									Header: 'Total Price',
+									accessor: 'total_price',
+									style: { textAlign: "right" }
+								}, {
+									Header: 'COGS Per Unit',
+									accessor: 'cogs_amount',
+									style: { textAlign: "right" }
+								}, {
+									Header: 'Total COGS',
+									accessor: 'total_cogs',
+									style: { textAlign: "right" }
+								}, {
+									Header: 'Entered By',
+									accessor: 'user_id',
+									style: { textAlign: "right" }
+								}, {
+									Header: 'Status',
+									accessor: 'active'
+								}]}
+							/>
+						</div>
 					</div>
-
 				</div>
 			</React.Fragment>
 		);
