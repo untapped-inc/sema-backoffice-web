@@ -16,9 +16,19 @@ import SalesByChannelChart from "./Sales/SalesByChannelChart";
 import SalesByChannelTimeChart from "./Sales/SalesByChannelTimeChart";
 import LoadProgress from "../LoadProgress";
 import { utilService } from '../../services';
-import ReactTable from "react-table";
-import "react-table/react-table.css";
 import moment from 'moment';
+import {
+	TreeDataState,
+  	CustomTreeData,
+  } from '@devexpress/dx-react-grid';
+import {
+	Grid,
+	VirtualTable,
+	TableHeaderRow,
+	TableTreeColumn,
+	TableColumnResizing,
+	TableFixedColumns
+} from '@devexpress/dx-react-grid-bootstrap3';
 
 let dateFormat = require('dateformat');
 
@@ -26,6 +36,64 @@ class SemaSales extends Component {
 	constructor(props, context) {
 		super(props, context);
 		console.log("SeamaSales - Constructor");
+
+		this.state = {
+			columns: [
+				{ title: 'ID', name: 'id' },
+				{ title: 'Created Date', name: 'created_at', getCellValue: d => (moment(d.created_at).local().format("YYYY-MM-DD hh:mm:ss a")) },
+				{ title: 'Updated Date', name: 'updated_at', getCellValue: d => (moment(d.updated_at).local().format("YYYY-MM-DD hh:mm:ss a")) },
+				{ title: 'Customer Name', name: 'customer_account_id', getCellValue: c => {
+					if (!this.props.sales.salesInfo.customersHash)
+						return '';
+					const customer = this.props.sales.salesInfo.customersHash[c.customer_account_id];
+					return customer ? customer.name : '';
+				} },
+				{ title: 'Product SKU', name: 'product_id' },
+				{ title: 'Quantity', name: 'quantity' },
+				{ title: 'Amount Cash', name: 'amount_cash' },
+				{ title: 'Amount Mobile', name: 'amount_mobile' },
+				{ title: 'Amount Card', name: 'amount_card' },
+				{ title: 'Amount Loan', name: 'amount_loan' },
+				{ title: 'Payment Type', name: 'payment_type' },
+				{ title: 'Unit Price', name: 'unit_price' },
+				{ title: 'Total Price', name: 'total_price' },
+				{ title: 'COGS Per Unit', name: 'cogs_amount' },
+				{ title: 'Total COGS', name: 'total_cogs' },
+				{ title: 'Entered By', name: 'user_id' },
+				{ title: 'Status', name: 'active' }
+			],
+			defaultColumnWidths: [
+				{ columnName: 'id', width: 180 },
+				{ columnName: 'created_at', width: 180 },
+				{ columnName: 'updated_at', width: 180 },
+				{ columnName: 'customer_account_id', width: 180 },
+				{ columnName: 'product_id', width: 120 },
+				{ columnName: 'quantity', width: 120 },
+				{ columnName: 'amount_cash', width: 120, align: 'right' },
+				{ columnName: 'amount_mobile', width: 120 },
+				{ columnName: 'amount_card', width: 120 },
+				{ columnName: 'amount_loan', width: 120 },
+				{ columnName: 'payment_type', width: 120 },
+				{ columnName: 'unit_price', width: 120 },
+				{ columnName: 'total_price', width: 120 },
+				{ columnName: 'cogs_amount', width: 120 },
+				{ columnName: 'total_cogs', width: 120 },
+				{ columnName: 'user_id', width: 120 },
+				{ columnName: 'active', width: 120 }
+			],
+			tableColumnExtensions: [
+				{ columnName: 'quantity', align: 'right' },
+				{ columnName: 'amount_cash', align: 'right' },
+				{ columnName: 'amount_mobile', align: 'right' },
+				{ columnName: 'amount_card', align: 'right' },
+				{ columnName: 'amount_loan', align: 'right' },
+				{ columnName: 'unit_price', align: 'right' },
+				{ columnName: 'total_price', align: 'right' },
+				{ columnName: 'cogs_amount', align: 'right' },
+				{ columnName: 'total_cogs', align: 'right' },
+			],
+			leftColumns: ['id'],
+		};
 	}
 
 	render() {
@@ -91,92 +159,24 @@ class SemaSales extends Component {
 							</div>
 						</div>
 						<div className="SalesTableContainer">
-							<ReactTable
-								data={this.props.sales.salesInfo.receipts}
-								columns={[{
-									Header: 'ID',
-									accessor: 'id',
-									width: 100
-								}, {
-									Header: 'Created Date',
-									id: 'createdDate',
-									accessor: d => {
-										return moment(d.created_at)
-											.local()
-											.format("YYYY-MM-DD hh:mm:ss a")
-									},
-									width: 100
-								}, {
-									Header: 'Updated Date',
-									id: 'updatedDate',
-									accessor: d => {
-										return moment(d.updated_at)
-											.local()
-											.format("YYYY-MM-DD hh:mm:ss a")
-									},
-									width: 100
-								}, {
-									Header: 'Customer Name',
-									id: 'customerName',
-									accessor: c => {
-										if (!this.props.sales.salesInfo.customersHash)
-											return '';
-										const customer = this.props.sales.salesInfo.customersHash[c.customer_account_id];
-										return customer ? customer.name : '';
-									},
-									width: 150
-								}, {
-									Header: 'Product SKU',
-									accessor: 'product_id',
-									style: { textAlign: "right" }
-								}, {
-									Header: 'Quantity',
-									accessor: 'quantity',
-									style: { textAlign: "right" }
-								}, {
-									Header: 'Amount Cash',
-									accessor: 'amount_cash',
-									style: { textAlign: "right" }
-								}, {
-									Header: 'Amount Mobile',
-									accessor: 'amount_mobile',
-									style: { textAlign: "right" }
-								}, {
-									Header: 'Amount Card',
-									accessor: 'amount_card',
-									style: { textAlign: "right" }
-								}, {
-									Header: 'Amount Loan',
-									accessor: 'amount_loan',
-									style: { textAlign: "right" }
-								}, {
-									Header: 'Payment Type',
-									accessor: 'payment_type'
-								}, {
-									Header: 'Unit Price',
-									accessor: 'unit_price',
-									style: { textAlign: "right" }
-								}, {
-									Header: 'Total Price',
-									accessor: 'total_price',
-									style: { textAlign: "right" }
-								}, {
-									Header: 'COGS Per Unit',
-									accessor: 'cogs_amount',
-									style: { textAlign: "right" }
-								}, {
-									Header: 'Total COGS',
-									accessor: 'total_cogs',
-									style: { textAlign: "right" }
-								}, {
-									Header: 'Entered By',
-									accessor: 'user_id',
-									style: { textAlign: "right" }
-								}, {
-									Header: 'Status',
-									accessor: 'active'
-								}]}
-							/>
+							<Grid
+								rows={this.props.sales.salesInfo.receipts}
+								columns={this.state.columns}
+								>
+								<TreeDataState />
+								<CustomTreeData
+									getChildRows={(row, rootRows) => (row ? row.children : rootRows)}
+								/>
+								<VirtualTable columnExtensions={this.state.tableColumnExtensions} />
+								<TableColumnResizing defaultColumnWidths={this.state.defaultColumnWidths} />
+								<TableHeaderRow />
+								<TableTreeColumn
+									for="id"
+								/>
+								<TableFixedColumns
+									leftColumns={this.state.leftColumns}
+								/>
+							</Grid>
 						</div>
 					</div>
 				</div>

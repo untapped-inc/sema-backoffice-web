@@ -30,6 +30,39 @@
     lodash "^4.2.0"
     to-fast-properties "^2.0.0"
 
+"@devexpress/dx-core@1.11.0":
+  version "1.11.0"
+  resolved "https://registry.yarnpkg.com/@devexpress/dx-core/-/dx-core-1.11.0.tgz#f291d852e93531c3fa8a25ea7dd4f8bfe0d0c3c3"
+  integrity sha512-Kpw+Unx7lc10L3FJkLX/BbQHD8RIhirm9ZPJXpMfQdX1/KROMOoIo6n6gxcLAjU302NXNY5n7AlvHrw3KgNL+A==
+
+"@devexpress/dx-grid-core@1.11.0", "@devexpress/dx-grid-core@^1.11.0":
+  version "1.11.0"
+  resolved "https://registry.yarnpkg.com/@devexpress/dx-grid-core/-/dx-grid-core-1.11.0.tgz#c28a9b8bac2bae736da76aab5bc9be43326765ca"
+  integrity sha512-AEvppCbOhpLH6v/ZfYdEyMOjXxTQpbVizwy5U3/Zm0hNKdLSTnT0k1Iipt6elbJRvxrGe4dYgjvkiWhIaQ0pBg==
+
+"@devexpress/dx-react-core@^1.11.0":
+  version "1.11.0"
+  resolved "https://registry.yarnpkg.com/@devexpress/dx-react-core/-/dx-react-core-1.11.0.tgz#9f78aaf48a8b835aca6a993d8f9c82e0241feecb"
+  integrity sha512-RhqfjZxuyN/4amVVQCJmutvTQLk2mfU+CfaizWuJWw/bx7rjkSZXEV9r8k2z1Zs31mLW65LDkvesg2ty0B15sw==
+  dependencies:
+    "@devexpress/dx-core" "1.11.0"
+    prop-types "^15.7.2"
+
+"@devexpress/dx-react-grid-bootstrap3@^1.11.0":
+  version "1.11.0"
+  resolved "https://registry.yarnpkg.com/@devexpress/dx-react-grid-bootstrap3/-/dx-react-grid-bootstrap3-1.11.0.tgz#6650dc71da6cdedb62583fa3860afe64fabdaa81"
+  integrity sha512-D2s6vg5bJAp/9YjB7/B0rabPcMh+C3oKTF9onL8Mp88erVEKRQVre+arRqN7fQ26aVCI1v15LuOXTolyPREqBA==
+  dependencies:
+    classnames "^2.2.6"
+    prop-types "^15.7.2"
+
+"@devexpress/dx-react-grid@^1.11.0":
+  version "1.11.0"
+  resolved "https://registry.yarnpkg.com/@devexpress/dx-react-grid/-/dx-react-grid-1.11.0.tgz#cfa9a46f747aea88329bb7b52d72b52eaa6b781c"
+  integrity sha512-Wy7228viYQVn8R2KkIt9C79LZz2sch2ALeerTIn1HIzf24xiayA3+MSpBT/5NOcjUwf+cqAapWdidILz812hFA==
+  dependencies:
+    "@devexpress/dx-grid-core" "1.11.0"
+
 abab@^1.0.3:
   version "1.0.4"
   resolved "https://registry.yarnpkg.com/abab/-/abab-1.0.4.tgz#5faad9c2c07f60dd76770f71cf025b62a63cfd4e"
@@ -1559,7 +1592,7 @@ class-utils@^0.3.5:
     isobject "^3.0.0"
     static-extend "^0.1.1"
 
-classnames@^2.2.5:
+classnames@^2.2.5, classnames@^2.2.6:
   version "2.2.6"
   resolved "https://registry.yarnpkg.com/classnames/-/classnames-2.2.6.tgz#43935bffdd291f326dad0a205309b38d00f650ce"
 
@@ -6019,7 +6052,7 @@ prop-types-extra@^1.0.1:
     react-is "^16.3.2"
     warning "^3.0.0"
 
-prop-types@^15.5.10, prop-types@^15.5.4, prop-types@^15.5.8, prop-types@^15.6.1, prop-types@^15.6.2:
+prop-types@^15.5.10, prop-types@^15.5.4, prop-types@^15.5.8, prop-types@^15.6.1, prop-types@^15.6.2, prop-types@^15.7.2:
   version "15.7.2"
   resolved "https://registry.yarnpkg.com/prop-types/-/prop-types-15.7.2.tgz#52c41e75b8c87e72b9d9360e0206b99dcbffa6c5"
   dependencies:

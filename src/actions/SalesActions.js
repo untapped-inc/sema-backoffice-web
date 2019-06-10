@@ -65,7 +65,26 @@ const fetchSalesData = ( params) => {
 			salesInfo.salesByChannelHistory = await fetchSalesByChannelHistory(params, groupBy);
 			window.dispatchEvent(new CustomEvent("progressEvent", {detail: {progressPct:80}} ));
 
-			salesInfo.receipts = await fetchAllReceipts(params);
+			const receipts = await fetchAllReceipts(params);
+			const receiptsHash = {};
+			receipts.forEach(receipt => {
+				receiptsHash[receipt.id] = receipt;
+			});
+			for (let i = 0; i<receipts.length; i++) {
+				const receipt = receipts[i];
+				if (receipt.receipt_id) {
+					const parent_receipt = receiptsHash[receipt.receipt_id];
+					if (parent_receipt) {
+						if (!parent_receipt['children']) {
+							parent_receipt['children'] = [];
+						}
+						parent_receipt['children'].push({...receipt});
+						receipts.splice(i, 1);
+						i--;
+					}
+				}
+			}
+			salesInfo.receipts = receipts;
 			window.dispatchEvent(new CustomEvent("progressEvent", {detail: {progressPct:90}} ));
 
 			const allCustomers = await fetchAllCustomers(params);
