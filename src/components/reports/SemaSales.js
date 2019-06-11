@@ -53,7 +53,7 @@ class SemaSales extends Component {
 					if (!this.props.productsHash)
 						return '';
 					const product = this.props.productsHash[p.product_id];
-					return product ? product.name : '';
+					return product ? product.sku : '';
 				} },
 				{ title: 'Quantity', name: 'quantity' },
 				{ title: 'Amount Cash', name: 'amount_cash' },
@@ -71,7 +71,9 @@ class SemaSales extends Component {
 					const user = this.props.usersHash[u.user_id];
 					return user ? user.firstName + ' ' + user.lastName : '';
 				} },
-				{ title: 'Status', name: 'active' }
+				{ title: 'Status', name: 'active', getCellValue: row => {
+					return row.active ? 'Active' : 'Inactive'
+				} }
 			],
 			defaultColumnWidths: [
 				{ columnName: 'id', width: 180 },
