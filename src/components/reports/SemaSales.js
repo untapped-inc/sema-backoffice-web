@@ -16,6 +16,7 @@ import SalesByChannelChart from "./Sales/SalesByChannelChart";
 import SalesByChannelTimeChart from "./Sales/SalesByChannelTimeChart";
 import LoadProgress from "../LoadProgress";
 import { utilService } from '../../services';
+import { productsHashSelector, usersHashSelector } from '../../reducers/selectors';
 import moment from 'moment';
 import {
 	TreeDataState,
@@ -48,7 +49,12 @@ class SemaSales extends Component {
 					const customer = this.props.sales.salesInfo.customersHash[c.customer_account_id];
 					return customer ? customer.name : '';
 				} },
-				{ title: 'Product SKU', name: 'product_id' },
+				{ title: 'Product SKU', name: 'product_id', getCellValue: p => {
+					if (!this.props.productsHash)
+						return '';
+					const product = this.props.productsHash[p.product_id];
+					return product ? product.name : '';
+				} },
 				{ title: 'Quantity', name: 'quantity' },
 				{ title: 'Amount Cash', name: 'amount_cash' },
 				{ title: 'Amount Mobile', name: 'amount_mobile' },
@@ -59,7 +65,12 @@ class SemaSales extends Component {
 				{ title: 'Total Price', name: 'total_price' },
 				{ title: 'COGS Per Unit', name: 'cogs_amount' },
 				{ title: 'Total COGS', name: 'total_cogs' },
-				{ title: 'Entered By', name: 'user_id' },
+				{ title: 'Entered By', name: 'user_id', getCellValue: u => {
+					if (!this.props.usersHash)
+						return '';
+					const user = this.props.usersHash[u.user_id];
+					return user ? user.firstName + ' ' + user.lastName : '';
+				} },
 				{ title: 'Status', name: 'active' }
 			],
 			defaultColumnWidths: [
@@ -373,7 +384,9 @@ function mapStateToProps(state) {
 	return {
 		sales:state.sales,
 		kiosk:state.kiosk,
-		healthCheck: state.healthCheck
+		healthCheck: state.healthCheck,
+		productsHash: productsHashSelector(state),
+		usersHash: usersHashSelector(state)
 	};
 }
 
