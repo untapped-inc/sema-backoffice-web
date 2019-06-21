@@ -39,6 +39,8 @@ import '../../../node_modules/react-datetime/css/react-datetime.css';
 
 let dateFormat = require('dateformat');
 
+const getRowId = row => row.id;
+
 const dateTimeFormatter = ({ value }) => value ? moment(value).format("YYYY-MM-DD hh:mm:ss a") : '';
 const dateTimeEditor = ({ value, onValueChange }) => {
 	if (value) {
@@ -69,13 +71,8 @@ class SemaSales extends Component {
 				{ title: 'ID', name: 'id' },
 				{ title: 'Created Date', name: 'created_at' },
 				{ title: 'Updated Date', name: 'updated_at' },
-				{ title: 'Customer Name', name: 'customer_account_id'},
-				{ title: 'Product SKU', name: 'product_id', getCellValue: p => {
-					if (!this.props.productsHash)
-						return '';
-					const product = this.props.productsHash[p.product_id];
-					return product ? product.sku : '';
-				} },
+				{ title: 'Customer Name', name: 'customer_account_id' },
+				{ title: 'Product SKU', name: 'product_id' },
 				{ title: 'Quantity', name: 'quantity' },
 				{ title: 'Amount Cash', name: 'amount_cash' },
 				{ title: 'Amount Mobile', name: 'amount_mobile' },
@@ -137,7 +134,11 @@ class SemaSales extends Component {
 			if (Object.keys(addedData).length > 0) {
 				console.log(addedData);
 			}
-
+		}
+		if (changed && Object.keys(changed).length > 0) {
+			for(let id in changed) {
+				console.log(id, changed[id])
+			}
 		}
 	}
 
@@ -173,6 +174,30 @@ class SemaSales extends Component {
 		/>
 	);
 
+	productFormatter = ({ value }) => {
+		if (this.props.productsHash && value) {
+			const product = this.props.productsHash[value];
+			if (product)
+				return product.sku;
+			return '';
+		}
+		return '';
+	}
+	productEditor = ({ value, onValueChange }) => {
+		if (this.props.products) {
+			return (
+				<select
+					className="form-control"
+					value={value}
+					onChange={e => onValueChange(e.target.value)}
+				>
+					<option></option>
+					{this.props.products.map(product =>
+						(<option key={product.id} value={product.id}>{product.sku}</option>))}
+				</select>
+			);
+		}
+	};
 	productTypeProvider = props => (
 		<DataTypeProvider
 			formatterComponent={this.productFormatter}
@@ -247,11 +272,13 @@ class SemaSales extends Component {
 							<Grid
 								rows={this.props.sales.salesInfo.receipts}
 								columns={this.state.columns}
+								getRowId={getRowId}
 								>
 								<DateTimeTypeProvider
 									for={this.state.dateTimeColumns}
 								/>
 								{this.customerTypeProvider({ for: ['customer_account_id'] })}
+								{this.productTypeProvider({ for: ['product_id'] })}
 								<TreeDataState />
 								<CustomTreeData
 									getChildRows={(row, rootRows) => (row ? row.children : rootRows)}
