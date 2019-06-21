@@ -20,7 +20,9 @@ import { productsHashSelector, usersHashSelector } from '../../reducers/selector
 import moment from 'moment';
 import {
 	TreeDataState,
-  	CustomTreeData,
+	CustomTreeData,
+	EditingState,
+	DataTypeProvider
   } from '@devexpress/dx-react-grid';
 import {
 	Grid,
@@ -28,10 +30,34 @@ import {
 	TableHeaderRow,
 	TableTreeColumn,
 	TableColumnResizing,
-	TableFixedColumns
+	TableFixedColumns,
+	TableEditRow,
+  	TableEditColumn,
 } from '@devexpress/dx-react-grid-bootstrap3';
+import DateTime from 'react-datetime';
+import '../../../node_modules/react-datetime/css/react-datetime.css';
 
 let dateFormat = require('dateformat');
+
+const dateTimeFormatter = ({ value }) => value ? moment(value).format("YYYY-MM-DD hh:mm:ss a") : '';
+const dateTimeEditor = ({ value, onValueChange }) => {
+	if (value) {
+		return (
+			<DateTime
+				value={new Date(value)}
+				onChange={date => onValueChange(moment(date).format("YYYY-MM-DDTHH:mm:ss"))}
+			/>
+		);
+	}
+	return <DateTime onChange={date => onValueChange(moment(date).format("YYYY-MM-DDTHH:mm:ss"))} />;
+};
+const DateTimeTypeProvider = props => (
+	<DataTypeProvider
+		formatterComponent={dateTimeFormatter}
+		editorComponent={dateTimeEditor}
+		{...props}
+	/>
+);
 
 class SemaSales extends Component {
 	constructor(props, context) {
@@ -41,8 +67,8 @@ class SemaSales extends Component {
 		this.state = {
 			columns: [
 				{ title: 'ID', name: 'id' },
-				{ title: 'Created Date', name: 'created_at', getCellValue: d => (moment(d.created_at).local().format("YYYY-MM-DD hh:mm:ss a")) },
-				{ title: 'Updated Date', name: 'updated_at', getCellValue: d => (moment(d.updated_at).local().format("YYYY-MM-DD hh:mm:ss a")) },
+				{ title: 'Created Date', name: 'created_at' },
+				{ title: 'Updated Date', name: 'updated_at' },
 				{ title: 'Customer Name', name: 'customer_account_id', getCellValue: c => {
 					if (!this.props.sales.salesInfo.customersHash)
 						return '';
@@ -75,6 +101,8 @@ class SemaSales extends Component {
 					return row.active ? 'Active' : 'Inactive'
 				} }
 			],
+			dateTimeColumns: ['created_at', 'updated_at'],
+			customerColumns: ['customer_account_id'],
 			defaultColumnWidths: [
 				{ columnName: 'id', width: 180 },
 				{ columnName: 'created_at', width: 180 },
@@ -106,7 +134,22 @@ class SemaSales extends Component {
 				{ columnName: 'total_cogs', align: 'right' },
 			],
 			leftColumns: ['id'],
+			editingColumnExtensions: [
+				{
+					columnName: 'created_at',
+					createRowChange: (row, value) => ({ ...row, created_at: value }),
+				},
+				{
+					columnName: 'quantity',
+					createRowChange: (row, value) => ({ ...row, quantity: value }),
+				},
+			],
 		};
+	}
+
+	commitChanges({ added, changed, deleted }) {
+		console.log('Added data', added);
+		console.log('Changed data', changed);
 	}
 
 	render() {
@@ -176,13 +219,23 @@ class SemaSales extends Component {
 								rows={this.props.sales.salesInfo.receipts}
 								columns={this.state.columns}
 								>
+								<DateTimeTypeProvider
+									for={this.state.dateTimeColumns}
+								/>
 								<TreeDataState />
 								<CustomTreeData
 									getChildRows={(row, rootRows) => (row ? row.children : rootRows)}
 								/>
+								<EditingState
+									columnExtensions={this.state.editingColumnExtensions}
+									onCommitChanges={this.commitChanges}
+								/>
 								<VirtualTable columnExtensions={this.state.tableColumnExtensions} />
 								<TableColumnResizing defaultColumnWidths={this.state.defaultColumnWidths} />
 								<TableHeaderRow />
+
+								<TableEditRow />
+								<TableEditColumn showAddCommand showEditCommand showDeleteCommand />
 								<TableTreeColumn
 									for="id"
 								/>
