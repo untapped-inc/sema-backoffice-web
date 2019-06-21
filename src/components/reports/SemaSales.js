@@ -69,12 +69,7 @@ class SemaSales extends Component {
 				{ title: 'ID', name: 'id' },
 				{ title: 'Created Date', name: 'created_at' },
 				{ title: 'Updated Date', name: 'updated_at' },
-				{ title: 'Customer Name', name: 'customer_account_id', getCellValue: c => {
-					if (!this.props.sales.salesInfo.customersHash)
-						return '';
-					const customer = this.props.sales.salesInfo.customersHash[c.customer_account_id];
-					return customer ? customer.name : '';
-				} },
+				{ title: 'Customer Name', name: 'customer_account_id'},
 				{ title: 'Product SKU', name: 'product_id', getCellValue: p => {
 					if (!this.props.productsHash)
 						return '';
@@ -102,7 +97,6 @@ class SemaSales extends Component {
 				} }
 			],
 			dateTimeColumns: ['created_at', 'updated_at'],
-			customerColumns: ['customer_account_id'],
 			defaultColumnWidths: [
 				{ columnName: 'id', width: 180 },
 				{ columnName: 'created_at', width: 180 },
@@ -134,23 +128,58 @@ class SemaSales extends Component {
 				{ columnName: 'total_cogs', align: 'right' },
 			],
 			leftColumns: ['id'],
-			editingColumnExtensions: [
-				{
-					columnName: 'created_at',
-					createRowChange: (row, value) => ({ ...row, created_at: value }),
-				},
-				{
-					columnName: 'quantity',
-					createRowChange: (row, value) => ({ ...row, quantity: value }),
-				},
-			],
 		};
 	}
 
 	commitChanges({ added, changed, deleted }) {
-		console.log('Added data', added);
-		console.log('Changed data', changed);
+		if (added && added.length > 0) {
+			const addedData = added[0];
+			if (Object.keys(addedData).length > 0) {
+				console.log(addedData);
+			}
+
+		}
 	}
+
+	customerFormatter = ({ value }) => {
+		if (this.props.sales.salesInfo.customersHash && value) {
+			const customer = this.props.sales.salesInfo.customersHash[value];
+			if (customer)
+				return customer.name;
+			return '';
+		}
+		return '';
+	}
+	customerEditor = ({ value, onValueChange }) => {
+		if (this.props.sales.salesInfo.customerSales) {
+			return (
+				<select
+					className="form-control"
+					value={value}
+					onChange={e => onValueChange(e.target.value)}
+				>
+					<option></option>
+					{this.props.sales.salesInfo.customerSales.map(customer =>
+						(<option key={customer.id} value={customer.id}>{customer.name}</option>))}
+				</select>
+			);
+		}
+	};
+	customerTypeProvider = props => (
+		<DataTypeProvider
+			formatterComponent={this.customerFormatter}
+			editorComponent={this.customerEditor}
+			{...props}
+		/>
+	);
+
+	productTypeProvider = props => (
+		<DataTypeProvider
+			formatterComponent={this.productFormatter}
+			editorComponent={this.productEditor}
+			{...props}
+		/>
+	);
 
 	render() {
 		return this.showContent();
@@ -222,6 +251,7 @@ class SemaSales extends Component {
 								<DateTimeTypeProvider
 									for={this.state.dateTimeColumns}
 								/>
+								{this.customerTypeProvider({ for: ['customer_account_id'] })}
 								<TreeDataState />
 								<CustomTreeData
 									getChildRows={(row, rootRows) => (row ? row.children : rootRows)}
@@ -440,6 +470,7 @@ function mapStateToProps(state) {
 		sales:state.sales,
 		kiosk:state.kiosk,
 		healthCheck: state.healthCheck,
+		products: state.products,
 		productsHash: productsHashSelector(state),
 		usersHash: usersHashSelector(state)
 	};
