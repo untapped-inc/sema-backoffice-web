@@ -83,15 +83,8 @@ class SemaSales extends Component {
 				{ title: 'Total Price', name: 'total_price' },
 				{ title: 'COGS Per Unit', name: 'cogs_amount' },
 				{ title: 'Total COGS', name: 'total_cogs' },
-				{ title: 'Entered By', name: 'user_id', getCellValue: u => {
-					if (!this.props.usersHash)
-						return '';
-					const user = this.props.usersHash[u.user_id];
-					return user ? user.firstName + ' ' + user.lastName : '';
-				} },
-				{ title: 'Status', name: 'active', getCellValue: row => {
-					return row.active ? 'Active' : 'Inactive'
-				} }
+				{ title: 'Entered By', name: 'user_id' },
+				{ title: 'Status', name: 'active' }
 			],
 			dateTimeColumns: ['created_at', 'updated_at'],
 			defaultColumnWidths: [
@@ -206,6 +199,62 @@ class SemaSales extends Component {
 		/>
 	);
 
+	userFormatter = ({ value }) => {
+		if (this.props.usersHash && value) {
+			const user = this.props.usersHash[value];
+			if (user)
+				return user.firstName + ' ' + user.lastName;
+			return '';
+		}
+		return '';
+	}
+	userEditor = ({ value, onValueChange }) => {
+		if (this.props.users) {
+			return (
+				<select
+					className="form-control"
+					value={value}
+					onChange={e => onValueChange(e.target.value)}
+				>
+					<option></option>
+					{this.props.users.map(user =>
+						(<option key={user.id} value={user.id}>{user.firstName + ' ' + user.lastName}</option>))}
+				</select>
+			);
+		}
+	};
+	userTypeProvider = props => (
+		<DataTypeProvider
+			formatterComponent={this.userFormatter}
+			editorComponent={this.userEditor}
+			{...props}
+		/>
+	);
+
+	statusFormatter = ({ value }) => (value ? 'Active' : 'Inactive')
+	statusEditor = ({ value, onValueChange }) => (
+		<select
+			className="form-control"
+			value={value}
+			onChange={e => onValueChange(e.target.value === 'true')}
+		>
+			<option></option>
+			<option value={false}>
+				Inactive
+			</option>
+			<option value>
+				Active
+			</option>
+		</select>
+	);
+	statusTypeProvider = props => (
+		<DataTypeProvider
+			formatterComponent={this.statusFormatter}
+			editorComponent={this.statusEditor}
+			{...props}
+		/>
+	);
+
 	render() {
 		return this.showContent();
 	}
@@ -279,6 +328,8 @@ class SemaSales extends Component {
 								/>
 								{this.customerTypeProvider({ for: ['customer_account_id'] })}
 								{this.productTypeProvider({ for: ['product_id'] })}
+								{this.userTypeProvider({ for: ['user_id'] })}
+								{this.statusTypeProvider({ for: ['active'] })}
 								<TreeDataState />
 								<CustomTreeData
 									getChildRows={(row, rootRows) => (row ? row.children : rootRows)}
@@ -499,6 +550,7 @@ function mapStateToProps(state) {
 		healthCheck: state.healthCheck,
 		products: state.products,
 		productsHash: productsHashSelector(state),
+		users: state.users,
 		usersHash: usersHashSelector(state)
 	};
 }
