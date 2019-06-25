@@ -48,10 +48,11 @@ const dateTimeEditor = ({ value, onValueChange }) => {
 			<DateTime
 				value={new Date(value)}
 				onChange={date => onValueChange(moment(date).format("YYYY-MM-DDTHH:mm:ss"))}
+				inputProps={{disabled: true}}
 			/>
 		);
 	}
-	return <DateTime onChange={date => onValueChange(moment(date).format("YYYY-MM-DDTHH:mm:ss"))} />;
+	return <DateTime onChange={date => onValueChange(moment(date).format("YYYY-MM-DDTHH:mm:ss"))} inputProps={{disabled: true}} />;
 };
 const DateTimeTypeProvider = props => (
 	<DataTypeProvider
@@ -117,7 +118,18 @@ class SemaSales extends Component {
 				{ columnName: 'cogs_amount', align: 'right' },
 				{ columnName: 'total_cogs', align: 'right' },
 			],
-			leftColumns: ['id'],
+			leftColumns: [TableEditColumn.COLUMN_TYPE, 'id'],
+			editingColumnExtensions: [
+				{ columnName: "id", editingEnabled: false },
+				{ columnName: "created_at", editingEnabled: false },
+				{ columnName: "updated_at", editingEnabled: false },
+				{ columnName: "payment_type", editingEnabled: false },
+				{ columnName: "unit_price", editingEnabled: false },
+				{ columnName: "total_price", editingEnabled: false },
+				{ columnName: "cogs_amount", editingEnabled: false },
+				{ columnName: "total_cogs", editingEnabled: false },
+				{ columnName: "user_id", editingEnabled: false }
+			]
 		};
 	}
 
@@ -215,6 +227,7 @@ class SemaSales extends Component {
 					className="form-control"
 					value={value}
 					onChange={e => onValueChange(e.target.value)}
+					disabled
 				>
 					<option></option>
 					{this.props.users.map(user =>
@@ -323,8 +336,13 @@ class SemaSales extends Component {
 								columns={this.state.columns}
 								getRowId={getRowId}
 								>
+								<EditingState
+									columnExtensions={this.state.editingColumnExtensions}
+									onCommitChanges={this.commitChanges}
+								/>
 								<DateTimeTypeProvider
 									for={this.state.dateTimeColumns}
+									columnExtensions={this.state.editingColumnExtensions}
 								/>
 								{this.customerTypeProvider({ for: ['customer_account_id'] })}
 								{this.productTypeProvider({ for: ['product_id'] })}
@@ -333,10 +351,6 @@ class SemaSales extends Component {
 								<TreeDataState />
 								<CustomTreeData
 									getChildRows={(row, rootRows) => (row ? row.children : rootRows)}
-								/>
-								<EditingState
-									columnExtensions={this.state.editingColumnExtensions}
-									onCommitChanges={this.commitChanges}
 								/>
 								<VirtualTable columnExtensions={this.state.tableColumnExtensions} />
 								<TableColumnResizing defaultColumnWidths={this.state.defaultColumnWidths} />
