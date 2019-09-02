@@ -70,10 +70,20 @@ class SemaSales extends Component {
 		this.state = {
 			columns: [
 				{ title: 'ID', name: 'id' },
-				{ title: 'Created Date', name: 'created_at' },
-				{ title: 'Updated Date', name: 'updated_at' },
-				{ title: 'Customer Name', name: 'customer_account_id' },
-				{ title: 'Product SKU', name: 'product_id' },
+				{ title: 'Created Date', name: 'created_at', getCellValue: d => (moment(d.created_at).local().format("YYYY-MM-DD hh:mm:ss a")) },
+				{ title: 'Updated Date', name: 'updated_at', getCellValue: d => (moment(d.updated_at).local().format("YYYY-MM-DD hh:mm:ss a")) },
+				{ title: 'Customer Name', name: 'customer_account_id', getCellValue: c => {
+					if (!this.props.sales.salesInfo.customersHash)
+						return '';
+					const customer = this.props.sales.salesInfo.customersHash[c.customer_account_id];
+					return customer ? customer.name : '';
+				} },
+				{ title: 'Product SKU', name: 'product_id', getCellValue: p => {
+					if (!this.props.productsHash)
+						return '';
+					const product = this.props.productsHash[p.product_id];
+					return product ? product.sku : '';
+				} },
 				{ title: 'Quantity', name: 'quantity' },
 				{ title: 'Amount Cash', name: 'amount_cash' },
 				{ title: 'Amount Mobile', name: 'amount_mobile' },
@@ -84,8 +94,15 @@ class SemaSales extends Component {
 				{ title: 'Total Price', name: 'total_price' },
 				{ title: 'COGS Per Unit', name: 'cogs_amount' },
 				{ title: 'Total COGS', name: 'total_cogs' },
-				{ title: 'Entered By', name: 'user_id' },
-				{ title: 'Status', name: 'active' }
+				{ title: 'Entered By', name: 'user_id', getCellValue: u => {
+					if (!this.props.usersHash)
+						return '';
+					const user = this.props.usersHash[u.user_id];
+					return user ? user.firstName + ' ' + user.lastName : '';
+				} },
+				{ title: 'Status', name: 'active', getCellValue: row => {
+					return row.active ? 'Active' : 'Inactive'
+				} }
 			],
 			dateTimeColumns: ['created_at', 'updated_at'],
 			defaultColumnWidths: [
