@@ -5,7 +5,7 @@
   "dependencies": {
     "axios": "^0.18.0",
     "base-64": "^0.1.0",
-    "bootstrap": "3.3.7",
+    "bootstrap": "3.4.1",
     "chart.js": "^2.7.2",
     "convert-units": "https://github.com/untapped-inc/convert-units",
     "dateformat": "^3.0.3",
