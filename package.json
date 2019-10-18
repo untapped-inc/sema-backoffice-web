@@ -12,7 +12,7 @@
     "formik": "^1.5.1",
     "google-maps-react": "^2.0.2",
     "history": "^4.7.2",
-    "jquery": "^3.3.1",
+    "jquery": "^3.4.0",
     "jsonwebtoken": "^8.3.0",
     "lodash": "^4.17.11",
     "moment": "^2.21.0",
