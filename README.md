@@ -3,6 +3,11 @@
 SEMA Back Office is a React Web client that allows SWE admins or other specific roles to analyze data (sent through the SEMA POS) so they can take better business decisions and to perform administrative tasks.
 
 ---
+
+## Screenshots
+
+TBD
+
 ## Requirements
 
 For development, you will need Node.js, and a node global package manager, Yarn, installed in your environement.
@@ -34,7 +39,7 @@ It should start running at http://localhost:3000
 
 ## Contributing
 
-TODO
+Please, read our [Contribution Guidelines](https://github.com/untapped-inc/sema-back-office-web/blob/master/CONTRIBUTING.md) if you wish to participate into the development of SEMA.
 
 ## Building for Production
 
