@@ -12,3 +12,23 @@ export const createAlertMessageSelector = actions => state =>
     .map(action => _.get(state, `alert.error`))
     .compact()
     .first() || '';
+
+export const productsHashSelector = state => {
+	const productsHash = {};
+	if (state.products) {
+		state.products.forEach(product => {
+			productsHash[product.id] = product;
+		});
+	}
+	return productsHash;
+}
+
+export const usersHashSelector = state => {
+	const usersHash = {};
+	if (state.users) {
+		state.users.forEach(user => {
+			usersHash[user.id] = user;
+		});
+	}
+	return usersHash;
+}

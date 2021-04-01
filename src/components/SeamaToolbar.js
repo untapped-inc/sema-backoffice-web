@@ -20,6 +20,8 @@ import {
   salesActions,
   waterOperationsActions
 } from '../actions';
+import { getProducts } from '../actions/ProductActions';
+import { fetchUsers } from '../actions/UserActions';
 import { withRouter } from 'react-router';
 import SemaDateFilter from "./SemaDateFilter";
 
@@ -104,7 +106,9 @@ class SeamaToolbar extends Component {
         this.props.customerActions.fetchCustomer(params);
         break;
       case "/sales":
-        this.props.salesActions.fetchSales(params);
+		this.props.salesActions.fetchSales(params);
+		this.props.getProducts();
+		this.props.fetchUsers();
         break;
       case "/":
         this.props.waterOperationsActions.fetchWaterOperations(params);
@@ -206,7 +210,9 @@ function mapDispatchToProps(dispatch) {
     volumeActions: bindActionCreators(volumeActions, dispatch),
 		salesActions:bindActionCreators(salesActions, dispatch),
 		waterOperationsActions:bindActionCreators(waterOperationsActions, dispatch),
-		customerActions: bindActionCreators(customerActions, dispatch)
+		customerActions: bindActionCreators(customerActions, dispatch),
+	getProducts: bindActionCreators(getProducts, dispatch),
+	fetchUsers: bindActionCreators(fetchUsers, dispatch)
   };
 }
 

@@ -18,7 +18,7 @@ import { history } from './utils';
 class App extends Component {
   componentDidMount() {
     let self = this;
-  
+
 		this.unlisten = history.listen((location, action) => {
 			let params = {}
 			params.startDate = this.props.dateFilter.startDate;
@@ -50,6 +50,7 @@ class App extends Component {
 				case "/sales":
 					if( ! this.props.sales.loaded && this.props.kiosk.selectedKiosk && this.props.kiosk.selectedKiosk.kioskID ) {
 						this.props.salesActions.fetchSales(params);
+						this.props.customerActions.fetchCustomer(params);
 					}
 					break;
 				default:

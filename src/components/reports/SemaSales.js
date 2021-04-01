@@ -16,14 +16,257 @@ import SalesByChannelChart from "./Sales/SalesByChannelChart";
 import SalesByChannelTimeChart from "./Sales/SalesByChannelTimeChart";
 import LoadProgress from "../LoadProgress";
 import { utilService } from '../../services';
+import { productsHashSelector, usersHashSelector } from '../../reducers/selectors';
+import moment from 'moment';
+import {
+	TreeDataState,
+	CustomTreeData,
+	EditingState,
+	DataTypeProvider
+  } from '@devexpress/dx-react-grid';
+import {
+	Grid,
+	VirtualTable,
+	TableHeaderRow,
+	TableTreeColumn,
+	TableColumnResizing,
+	TableFixedColumns,
+	TableEditRow,
+  	TableEditColumn,
+} from '@devexpress/dx-react-grid-bootstrap3';
+import DateTime from 'react-datetime';
+import '../../../node_modules/react-datetime/css/react-datetime.css';
 
 let dateFormat = require('dateformat');
+
+const getRowId = row => row.id;
+
+const dateTimeFormatter = ({ value }) => value ? moment(value).format("YYYY-MM-DD hh:mm:ss a") : '';
+const dateTimeEditor = ({ value, onValueChange }) => {
+	if (value) {
+		return (
+			<DateTime
+				value={new Date(value)}
+				onChange={date => onValueChange(moment(date).format("YYYY-MM-DDTHH:mm:ss"))}
+				inputProps={{disabled: true}}
+			/>
+		);
+	}
+	return <DateTime onChange={date => onValueChange(moment(date).format("YYYY-MM-DDTHH:mm:ss"))} inputProps={{disabled: true}} />;
+};
+const DateTimeTypeProvider = props => (
+	<DataTypeProvider
+		formatterComponent={dateTimeFormatter}
+		editorComponent={dateTimeEditor}
+		{...props}
+	/>
+);
 
 class SemaSales extends Component {
 	constructor(props, context) {
 		super(props, context);
 		console.log("SeamaSales - Constructor");
+
+		this.state = {
+			columns: [
+				{ title: 'ID', name: 'id' },
+				{ title: 'Created Date', name: 'created_at' },
+				{ title: 'Updated Date', name: 'updated_at' },
+				{ title: 'Customer Name', name: 'customer_account_id' },
+				{ title: 'Product SKU', name: 'product_id' },
+				{ title: 'Quantity', name: 'quantity' },
+				{ title: 'Amount Cash', name: 'amount_cash' },
+				{ title: 'Amount Mobile', name: 'amount_mobile' },
+				{ title: 'Amount Card', name: 'amount_card' },
+				{ title: 'Amount Loan', name: 'amount_loan' },
+				{ title: 'Payment Type', name: 'payment_type' },
+				{ title: 'Unit Price', name: 'unit_price' },
+				{ title: 'Total Price', name: 'total_price' },
+				{ title: 'COGS Per Unit', name: 'cogs_amount' },
+				{ title: 'Total COGS', name: 'total_cogs' },
+				{ title: 'Entered By', name: 'user_id' },
+				{ title: 'Status', name: 'active' }
+			],
+			dateTimeColumns: ['created_at', 'updated_at'],
+			defaultColumnWidths: [
+				{ columnName: 'id', width: 180 },
+				{ columnName: 'created_at', width: 180 },
+				{ columnName: 'updated_at', width: 180 },
+				{ columnName: 'customer_account_id', width: 180 },
+				{ columnName: 'product_id', width: 120 },
+				{ columnName: 'quantity', width: 120 },
+				{ columnName: 'amount_cash', width: 120, align: 'right' },
+				{ columnName: 'amount_mobile', width: 120 },
+				{ columnName: 'amount_card', width: 120 },
+				{ columnName: 'amount_loan', width: 120 },
+				{ columnName: 'payment_type', width: 120 },
+				{ columnName: 'unit_price', width: 120 },
+				{ columnName: 'total_price', width: 120 },
+				{ columnName: 'cogs_amount', width: 120 },
+				{ columnName: 'total_cogs', width: 120 },
+				{ columnName: 'user_id', width: 120 },
+				{ columnName: 'active', width: 120 }
+			],
+			tableColumnExtensions: [
+				{ columnName: 'quantity', align: 'right' },
+				{ columnName: 'amount_cash', align: 'right' },
+				{ columnName: 'amount_mobile', align: 'right' },
+				{ columnName: 'amount_card', align: 'right' },
+				{ columnName: 'amount_loan', align: 'right' },
+				{ columnName: 'unit_price', align: 'right' },
+				{ columnName: 'total_price', align: 'right' },
+				{ columnName: 'cogs_amount', align: 'right' },
+				{ columnName: 'total_cogs', align: 'right' },
+			],
+			leftColumns: [TableEditColumn.COLUMN_TYPE, 'id'],
+			editingColumnExtensions: [
+				{ columnName: "id", editingEnabled: false },
+				{ columnName: "created_at", editingEnabled: false },
+				{ columnName: "updated_at", editingEnabled: false },
+				{ columnName: "payment_type", editingEnabled: false },
+				{ columnName: "unit_price", editingEnabled: false },
+				{ columnName: "total_price", editingEnabled: false },
+				{ columnName: "cogs_amount", editingEnabled: false },
+				{ columnName: "total_cogs", editingEnabled: false },
+				{ columnName: "user_id", editingEnabled: false }
+			]
+		};
 	}
+
+	commitChanges({ added, changed, deleted }) {
+		if (added && added.length > 0) {
+			const addedData = added[0];
+			if (Object.keys(addedData).length > 0) {
+				console.log(addedData);
+			}
+		}
+		if (changed && Object.keys(changed).length > 0) {
+			for(let id in changed) {
+				console.log(id, changed[id])
+			}
+		}
+	}
+
+	customerFormatter = ({ value }) => {
+		if (this.props.sales.salesInfo.customersHash && value) {
+			const customer = this.props.sales.salesInfo.customersHash[value];
+			if (customer)
+				return customer.name;
+			return '';
+		}
+		return '';
+	}
+	customerEditor = ({ value, onValueChange }) => {
+		if (this.props.sales.salesInfo.customerSales) {
+			return (
+				<select
+					className="form-control"
+					value={value}
+					onChange={e => onValueChange(e.target.value)}
+				>
+					<option></option>
+					{this.props.sales.salesInfo.customerSales.map(customer =>
+						(<option key={customer.id} value={customer.id}>{customer.name}</option>))}
+				</select>
+			);
+		}
+	};
+	customerTypeProvider = props => (
+		<DataTypeProvider
+			formatterComponent={this.customerFormatter}
+			editorComponent={this.customerEditor}
+			{...props}
+		/>
+	);
+
+	productFormatter = ({ value }) => {
+		if (this.props.productsHash && value) {
+			const product = this.props.productsHash[value];
+			if (product)
+				return product.sku;
+			return '';
+		}
+		return '';
+	}
+	productEditor = ({ value, onValueChange }) => {
+		if (this.props.products) {
+			return (
+				<select
+					className="form-control"
+					value={value}
+					onChange={e => onValueChange(e.target.value)}
+				>
+					<option></option>
+					{this.props.products.map(product =>
+						(<option key={product.id} value={product.id}>{product.sku}</option>))}
+				</select>
+			);
+		}
+	};
+	productTypeProvider = props => (
+		<DataTypeProvider
+			formatterComponent={this.productFormatter}
+			editorComponent={this.productEditor}
+			{...props}
+		/>
+	);
+
+	userFormatter = ({ value }) => {
+		if (this.props.usersHash && value) {
+			const user = this.props.usersHash[value];
+			if (user)
+				return user.firstName + ' ' + user.lastName;
+			return '';
+		}
+		return '';
+	}
+	userEditor = ({ value, onValueChange }) => {
+		if (this.props.users) {
+			return (
+				<select
+					className="form-control"
+					value={value}
+					onChange={e => onValueChange(e.target.value)}
+					disabled
+				>
+					<option></option>
+					{this.props.users.map(user =>
+						(<option key={user.id} value={user.id}>{user.firstName + ' ' + user.lastName}</option>))}
+				</select>
+			);
+		}
+	};
+	userTypeProvider = props => (
+		<DataTypeProvider
+			formatterComponent={this.userFormatter}
+			editorComponent={this.userEditor}
+			{...props}
+		/>
+	);
+
+	statusFormatter = ({ value }) => (value ? 'Active' : 'Inactive')
+	statusEditor = ({ value, onValueChange }) => (
+		<select
+			className="form-control"
+			value={value}
+			onChange={e => onValueChange(e.target.value === 'true')}
+		>
+			<option></option>
+			<option value={false}>
+				Inactive
+			</option>
+			<option value>
+				Active
+			</option>
+		</select>
+	);
+	statusTypeProvider = props => (
+		<DataTypeProvider
+			formatterComponent={this.statusFormatter}
+			editorComponent={this.statusEditor}
+			{...props}
+		/>
+	);
 
 	render() {
 		return this.showContent();
@@ -87,8 +330,43 @@ class SemaSales extends Component {
 								<SalesByChannelChart chartData={this.props.sales}/>
 							</div>
 						</div>
-					</div>
+						<div className="SalesTableContainer">
+							<Grid
+								rows={this.props.sales.salesInfo.receipts}
+								columns={this.state.columns}
+								getRowId={getRowId}
+								>
+								<EditingState
+									columnExtensions={this.state.editingColumnExtensions}
+									onCommitChanges={this.commitChanges}
+								/>
+								<DateTimeTypeProvider
+									for={this.state.dateTimeColumns}
+									columnExtensions={this.state.editingColumnExtensions}
+								/>
+								{this.customerTypeProvider({ for: ['customer_account_id'] })}
+								{this.productTypeProvider({ for: ['product_id'] })}
+								{this.userTypeProvider({ for: ['user_id'] })}
+								{this.statusTypeProvider({ for: ['active'] })}
+								<TreeDataState />
+								<CustomTreeData
+									getChildRows={(row, rootRows) => (row ? row.children : rootRows)}
+								/>
+								<VirtualTable columnExtensions={this.state.tableColumnExtensions} />
+								<TableColumnResizing defaultColumnWidths={this.state.defaultColumnWidths} />
+								<TableHeaderRow />
 
+								<TableEditRow />
+								<TableEditColumn showAddCommand showEditCommand showDeleteCommand />
+								<TableTreeColumn
+									for="id"
+								/>
+								<TableFixedColumns
+									leftColumns={this.state.leftColumns}
+								/>
+							</Grid>
+						</div>
+					</div>
 				</div>
 			</React.Fragment>
 		);
@@ -283,7 +561,11 @@ function mapStateToProps(state) {
 	return {
 		sales:state.sales,
 		kiosk:state.kiosk,
-		healthCheck: state.healthCheck
+		healthCheck: state.healthCheck,
+		products: state.products,
+		productsHash: productsHashSelector(state),
+		users: state.users,
+		usersHash: usersHashSelector(state)
 	};
 }
 
