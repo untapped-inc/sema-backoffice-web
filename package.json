@@ -6,7 +6,7 @@
     "axios": "^0.18.0",
     "base-64": "^0.1.0",
     "bootstrap": "3.3.7",
-    "chart.js": "^2.7.2",
+    "chart.js": "^2.9.4",
     "convert-units": "https://github.com/untapped-inc/convert-units",
     "dateformat": "^3.0.3",
     "formik": "^1.5.1",
